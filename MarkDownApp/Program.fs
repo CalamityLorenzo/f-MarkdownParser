@@ -27,13 +27,20 @@ let main argv =
     printfn "Hello World from F#!"
 
     let literalSpan = Literal "tony"
-    let orig = "`Ln 1 code ln 2 Things are getting weidfred spaced` and **Welcome** to the `jungle`"
+    let orig = "`Ln 1 code ln 2 Things are getting weidfred space d` and **Welcome** to the `jungle`"
     let activeTest = "**i  \nmportant `code` ** and _emphas  \n\rized_ `jungle` [This is the `important  \ncode Sneak` part](http://hotmail) HOwever this conti  \rnues to be awuse"
     
     //let basicInline =  orig |> List.ofSeq |> parseInline 
 
     let morecode = activeTest |> List.ofSeq |> parseSpans [] |> List.ofSeq
+    let f = match "Mr. Plinkett’s Transformers: The Last Knight Review" with
+            | AsCharList b->b
 
+    printfn "%d" f.Length
+    
+    let d =  f.[0..3]
+    printfn "%s" (String.Join("",d))
+    
     morecode |> Seq.toList |> translateMarkspan
     //let free = toTupleString basicInline
     //printfn "%s %s" free orig

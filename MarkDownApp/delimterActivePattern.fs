@@ -1,5 +1,6 @@
 ﻿module delimterActivePattern
 
+// Span management 
 let (|StartsWith|_|) prefix input = 
     let rec loop = function
         | p::prefix, r::rest when p=r -> loop (prefix, rest)
@@ -55,3 +56,26 @@ let (|LineBreaks|_|) = function
     | StartsWith (List.ofSeq "  \n") (rest)
     | StartsWith (List.ofSeq "  \r") (rest) -> Some(rest)
     | _ ->None
+
+// Block level managementr
+module List =
+    let partialWhile f =
+        let rec loop acc = function
+            | x::xs when f x -> loop (x::acc) xs // When f(x) is true then
+            | xs -> List.rev acc , xs // end result is a Tuple
+        loop []
+
+let (|PrefixedLines|) (prefix:string) (lines:list<string>) = 
+    let prefixed, other = 
+        lines |> List.partialWhile (fun line-> line.StartsWith(prefix))
+    [ for line in prefixed ->
+        line.Substring(prefix.Length) , other] // remove the prefix from the line
+
+let (|LineSeperated|) lines = 
+    let isWhite = System.String.IsNullOrWhiteSpace
+    match List.partialWhile (isWhite >> not) lines with 
+        | par, _::rest
+        | par, ([] as rest) -> par, rest
+
+let (|AsCharList|) (str:string) =
+    List.ofSeq str
