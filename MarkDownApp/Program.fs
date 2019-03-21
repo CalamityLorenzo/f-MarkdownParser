@@ -27,7 +27,7 @@ let main argv =
     printfn "Hello World from F#!"
 
     let literalSpan = Literal "tony"
-    let orig = "`Ln 1 code ln 2 Things are getting weidfrd` and **Welcome** to the `jungle`"
+    let orig = "`Ln 1 code ln 2 Things are getting weidfred spaced` and **Welcome** to the `jungle`"
     let activeTest = "**i  \nmportant `code` ** and _emphas  \n\rized_ `jungle` [This is the `important  \ncode Sneak` part](http://hotmail) HOwever this conti  \rnues to be awuse"
     
     //let basicInline =  orig |> List.ofSeq |> parseInline 
