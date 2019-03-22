@@ -28,7 +28,17 @@ let main argv =
 
     let literalSpan = Literal "tony"
     let orig = "`Ln 1 code ln 2 Things are getting weidfred space d` and **Welcome** to the `jungle`"
-    let activeTest = "**i  \nmportant `code` ** and _emphas  \n\rized_ `jungle` [This is the `important  \ncode Sneak` part](http://hotmail) HOwever this conti  \rnues to be awuse"
+    let activeTest = """# Introducing F#
+    F# is _functional-first_ language,
+    which looks like this:
+    
+        let msg = "world"
+        printfn "hello %s" msg
+    
+    This sample prints `hello world`
+    
+    **important `code` ** and _emphasized_ `jungle` [This is the `important  \ncode Sneak` part](http://hotmail) HOwever this conti  \rnues to be nusiance
+    """
     
     //let basicInline =  orig |> List.ofSeq |> parseInline 
 

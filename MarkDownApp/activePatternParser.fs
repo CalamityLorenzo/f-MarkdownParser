@@ -38,3 +38,26 @@ let rec parseSpans acc chars = seq{
     | [] -> yield! emitLiteral // end of the line just check to see if there is a lurking literal anywhere.
 }
 
+
+let rec parseBlocks lines = seq{
+    match lines with
+    //| AsCharList (StartsWith ['#';' '] heading)::lines-> // This seems odd but is the same as line::lines further down. It's just wrapped in function or two.
+    //    yield Heading(1, parseSpans [] heading |> List.ofSeq)
+    //    yield! parseBlocks lines
+    //| AsCharList (StartsWith ['#'; '#'; ' '] heading)::lines ->
+    //    yield Heading(2, parseSpans [] heading |> List.ofSeq)
+    //    yield! parseBlocks lines
+    | HeadingTest (size,heading, lines) ->
+        yield Heading(size, parseSpans [] heading |> List.ofSeq)
+        yield! parseBlocks lines
+    | PrefixedLines "    " (body, lines) when body <> [] -> // Complete match so no need to use the list syntax
+        yield CodeBlock (body)
+        yield! parseBlocks lines
+    | LineSeperated (body, lines) when body <> []->
+        let body = String.concat " " body |> List.ofSeq
+        yield Paragraph(parseSpans [] body |> List.ofSeq)
+        yield! parseBlocks lines
+    | line::lines when System.String.IsNullOrWhiteSpace(line)->
+        yield! parseBlocks lines
+    | _ -> ()
+}

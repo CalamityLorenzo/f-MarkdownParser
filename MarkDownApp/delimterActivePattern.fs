@@ -65,17 +65,34 @@ module List =
             | xs -> List.rev acc , xs // end result is a Tuple
         loop []
 
+let headingCheck line = 
+    let rec headingLoop accNumber  = function
+           | l::lne when l.Equals('#') -> headingLoop (accNumber +  1) lne
+           | l::lne when l.Equals(' ') -> Some(accNumber, lne)
+           | [] 
+           | _ -> None // These would be improperly formatted headingd
+
+    headingLoop 0 line
+
 let (|PrefixedLines|) (prefix:string) (lines:list<string>) = 
     let prefixed, other = 
         lines |> List.partialWhile (fun line-> line.StartsWith(prefix))
     [ for line in prefixed ->
-        line.Substring(prefix.Length) , other] // remove the prefix from the line
+        line.Substring(prefix.Length) ], other // remove the prefix from the line (That's an expression to make a tuple. Pithy)
 
-let (|LineSeperated|) lines = 
-    let isWhite = System.String.IsNullOrWhiteSpace
+let (|LineSeperated|) lines =  // returns (list untilFirstWhiteSpace (or no whitespace), list afterWhitepsace)
+    let isWhite = System.String.IsNullOrWhiteSpace 
     match List.partialWhile (isWhite >> not) lines with 
         | par, _::rest
         | par, ([] as rest) -> par, rest
+
+let (|HeadingTest|_|) =function
+         | (line:string)::rest when line.StartsWith('#') -> 
+            match line |> List.ofSeq |> headingCheck with
+            | Some(size, heading) -> Some(size, heading, rest)
+            | _ -> None
+         | [] 
+         | _ -> None
 
 let (|AsCharList|) (str:string) =
     List.ofSeq str
