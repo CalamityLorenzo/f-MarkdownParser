@@ -29,29 +29,31 @@ let main argv =
     let literalSpan = Literal "tony"
     let orig = "`Ln 1 code ln 2 Things are getting weidfred space d` and **Welcome** to the `jungle`"
     let activeTest = """# Introducing F#
-    F# is _functional-first_ language,
-    which looks like this:
+F# is _functional-first_ language,
+which looks like this:
     
-        let msg = "world"
-        printfn "hello %s" msg
+    let msg = "world"
+    printfn "hello %s" msg
     
-    This sample prints `hello world`
+ This sample prints `hello world`
     
-    **important `code` ** and _emphasized_ `jungle` [This is the `important  \ncode Sneak` part](http://hotmail) HOwever this conti  \rnues to be nusiance
-    """
+### This is getting in the way
+#Should be a liteal # literally
+**important `code` ** and _emphasized_ `jungle` [This is the `important  \ncode Sneak` part](http://hotmail) HOwever this conti  \rnues to be nusiance
+"""
     
-    //let basicInline =  orig |> List.ofSeq |> parseInline 
+     //let basicInline =  orig |> List.ofSeq |> parseInline 
 
-    let morecode = activeTest |> List.ofSeq |> parseSpans [] |> List.ofSeq
-    let f = match "Mr. Plinkett’s Transformers: The Last Knight Review" with
-            | AsCharList b->b
+    let morecode = activeTest.Split('\r','\n') |> List.ofSeq |> parseBlocks |> List.ofSeq
+    // let f = match "Mr. Plinkett’s Transformers: The Last Knight Review" with
+    //         | AsCharList b->b
 
-    printfn "%d" f.Length
+    // printfn "%d" f.Length
     
-    let d =  f.[0..3]
-    printfn "%s" (String.Join("",d))
+    // let d =  f.[0..3]
+    // printfn "%s" (String.Join("",d))
     
-    morecode |> Seq.toList |> translateMarkspan
+    
     //let free = toTupleString basicInline
     //printfn "%s %s" free orig
     0 // return an integer exit code

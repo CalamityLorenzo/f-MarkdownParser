@@ -67,7 +67,10 @@ module List =
 
 let headingCheck line = 
     let rec headingLoop accNumber  = function
-           | l::lne when l.Equals('#') -> headingLoop (accNumber +  1) lne
+           | l::lne when l.Equals('#') -> 
+            let acPLus = accNumber + 1
+            printfn "ac Plus%d" acPLus
+            headingLoop (acPLus) lne
            | l::lne when l.Equals(' ') -> Some(accNumber, lne)
            | [] 
            | _ -> None // These would be improperly formatted headingd
@@ -86,8 +89,10 @@ let (|LineSeperated|) lines =  // returns (list untilFirstWhiteSpace (or no whit
         | par, _::rest
         | par, ([] as rest) -> par, rest
 
-let (|HeadingTest|_|) =function
-         | (line:string)::rest when line.StartsWith('#') -> 
+let (|HeadingTest|_|) (lines:list<string>)=
+        match lines with
+         | line::rest when line.StartsWith("#") -> 
+            printfn "amtch"
             match line |> List.ofSeq |> headingCheck with
             | Some(size, heading) -> Some(size, heading, rest)
             | _ -> None
