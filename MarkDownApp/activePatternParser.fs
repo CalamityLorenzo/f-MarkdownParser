@@ -48,25 +48,19 @@ let rec parseBlocks lines = seq{
     //    yield Heading(2, parseSpans [] heading |> List.ofSeq)
     //    yield! parseBlocks lines
     | HeadingDash (size, heading, lines)  ->
-        printfn "heading"
         yield Heading(size, parseSpans [] heading |> List.ofSeq)
         yield! parseBlocks lines
     | HeadingHash (size,heading, lines) ->
-        printfn "heading old"
         yield Heading(size, parseSpans [] heading |> List.ofSeq)
         yield! parseBlocks lines
+    | HorizontalRow (lines) ->
+        yield HorizontalRule
+        yield! parseBlocks lines
     | PrefixedLines "    " (body, lines) when body <> [] -> // Complete match so no need to use the list syntax
-        printfn "prefixed lines"
-        let bString = System.String.Join("", body)
-        printfn "%s" bString
         yield CodeBlock (body)
         yield! parseBlocks lines
     | LineSeperated (body, lines) when body <> []->
-        printfn "lines seperated"
         let body = String.concat " " body |> List.ofSeq
-        printfn "prefixed lines"
-        let bString = System.String(body |> List.toArray)
-        printfn "%s" bString
         yield Paragraph(parseSpans [] body |> List.ofSeq)
         yield! parseBlocks lines
     | line::lines when System.String.IsNullOrWhiteSpace(line)->

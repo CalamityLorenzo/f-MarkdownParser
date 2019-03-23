@@ -109,8 +109,6 @@ let (|HeadingDash|_|) lines =
     // PartialWhile will allow me to match (first line with text, then the rest) if rest.[0] is - or = then we have a heading.
     let isWhite = System.String.IsNullOrWhiteSpace 
     match lines with
-    | h::tail when h.Equals(System.String.IsNullOrWhiteSpace) -> // empty row found  could be a horizontal 
-                None
     | h::tail when not(h.Equals(System.String.IsNullOrWhiteSpace)) -> 
         match tail with // We only need to match the first entry.
             | line::tail -> 
@@ -122,7 +120,17 @@ let (|HeadingDash|_|) lines =
                     | _ -> None
             | _ -> None
     | _ -> None
-    
+let (|HorizontalRow|_|) lines = 
+    let isWhite = System.String.IsNullOrWhiteSpace 
+    match lines with
+    | h::tail when h.Equals(System.String.IsNullOrWhiteSpace) -> // empty row found  could be a horizontal 
+                match tail with // We only need to match the first entry.
+                | line::tail -> 
+                    match line with
+                        | l when headingLine '*' l || headingLine '-' l || headingLine '_' l -> Some(tail)
+                        | _ -> None
+                | _ -> None
+    | _ -> None
 let (|HeadingHash|_|) =function
          | (line:string)::rest when line.StartsWith("#") ->  // the line starts with a # but is it actually a valid headers
             match line |> List.ofSeq |> headerTest with
