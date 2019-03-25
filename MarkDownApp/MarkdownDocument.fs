@@ -6,7 +6,7 @@ type MarkdownDocument = list<MarkdownBlock>
         | HorizontalRule
         | Paragraph of MarkdownSpans
         | CodeBlock of list<string>
-
+        | BlockQuote of list<MarkdownBlock>
     and MarkdownSpans = list<MarkdownSpan>
     
     and MarkdownSpan =

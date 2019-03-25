@@ -26,27 +26,31 @@ let translateMarkspan spans =
 let main argv =
     printfn "Hello World from F#!"
 
-    let literalSpan = Literal "tony"
-    let orig = "`Ln 1 code ln 2 Things are getting weidfred space d` and **Welcome** to the `jungle`"
-    let activeTest = """# Introducing F#
+    //let literalSpan = Literal "tony"
+    //let orig = "`Ln 1 code ln 2 Things are getting weidfred space d` and **Welcome** to the `jungle`"
+
+    let activeTest ="""> I am a block quote
+As am I.
+> carrying on the things that are occueing
+>     let boy = "meet world"
+
+The previous line terminated the blockquote
 F# is _functional-first_ language,
 which looks like this:
-    
+
     let msg = "world"
     printfn "hello %s" msg
-    
- This sample prints `hello world`
-    
-### This is getting in the way
-#Should be a liteal # literally
+
+This sample prints `hello world`
+===
 **important `code` ** and _emphasized_ `jungle` [This is the `important  \ncode Sneak` part](http://hotmail) HOwever this conti  \rnues to be nusiance
 """
     
      //let basicInline =  orig |> List.ofSeq |> parseInline 
 
-    let morecode = activeTest.Split('\r','\n') |> List.ofSeq |> parseBlocks |> List.ofSeq
-    // let f = match "Mr. Plinkett’s Transformers: The Last Knight Review" with
-    //         | AsCharList b->b
+    activeTest.Split('\r','\n') |> List.ofSeq |> parseBlocks  |> List.ofSeq |> ignore
+    let f = match "Mr. Plinkett’s Transformers: The Last Knight Review" with
+            | AsCharList b->b
 
     // printfn "%d" f.Length
     

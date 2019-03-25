@@ -54,10 +54,15 @@ let rec parseBlocks lines = seq{
         yield Heading(size, parseSpans [] heading |> List.ofSeq)
         yield! parseBlocks lines
     | HorizontalRow (lines) ->
+        printfn "HR"
         yield HorizontalRule
         yield! parseBlocks lines
     | PrefixedLines "    " (body, lines) when body <> [] -> // Complete match so no need to use the list syntax
+        printfn "PL %s" (String.concat " " body)
         yield CodeBlock (body)
+        yield! parseBlocks lines
+    | BlockQuotes (quote, lines)  ->
+        yield BlockQuote(parseBlocks quote |> Seq.toList)
         yield! parseBlocks lines
     | LineSeperated (body, lines) when body <> []->
         let body = String.concat " " body |> List.ofSeq

@@ -56,7 +56,7 @@ let (|LineBreaks|_|) input =
     match input with
     | StartsWith (List.ofSeq "  \\n\\r") (rest)
     | StartsWith (List.ofSeq "  \\n") (rest)
-    | StartsWith (List.ofSeq "  \\r") (rest) -> printfn"Success" ; Some(rest)
+    | StartsWith (List.ofSeq "  \\r") (rest) ->Some(rest)
     | _ ->None
 
 // Block level managementr
@@ -91,7 +91,9 @@ let headingLine chr (line:string) =
         true
     else 
         false
-    
+   
+
+
 let (|PrefixedLines|) (prefix:string) (lines:list<string>) = 
     let prefixed, other = 
         lines |> List.partialWhile (fun line-> line.StartsWith(prefix))
@@ -103,6 +105,11 @@ let (|LineSeperated|) lines =  // returns (list untilFirstWhiteSpace (or no whit
     match List.partialWhile (isWhite >> not) lines with 
         | par, _::rest
         | par, ([] as rest) -> par, rest
+
+
+let matchBlockQuote lines =
+    let (LineSeperated (quote, rest)) = lines
+    quote, rest
 
 let (|HeadingDash|_|) lines = 
     // Trying to find heading definitions === --- these appear UNDER another line. so we need the next line in a sequence/list
@@ -138,6 +145,16 @@ let (|HeadingHash|_|) =function
             | _ -> None
          | [] 
          | _ -> None
-
+let (|BlockQuotes|_|) (lines:list<string>) = 
+    match lines with 
+    | lne::_ when lne.StartsWith "> " -> 
+        let quote, rest = (matchBlockQuote lines)
+        Some([for line in quote ->
+                if line.StartsWith("> ") then
+                    line.Substring 2
+                else
+                    line
+        ], rest)
+    | _ -> None
 let (|AsCharList|) (str:string) =
     List.ofSeq str
