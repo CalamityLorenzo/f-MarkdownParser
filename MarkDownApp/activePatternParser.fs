@@ -47,7 +47,7 @@ let rec parseBlocks lines = seq{
     //| AsCharList (StartsWith ['#'; '#'; ' '] heading)::lines ->
     //    yield Heading(2, parseSpans [] heading |> List.ofSeq)
     //    yield! parseBlocks lines
-    | HeadingDash (size, heading, lines)  ->
+    | HeadingUnderline (size, heading, lines)  ->
         yield Heading(size, parseSpans [] heading |> List.ofSeq)
         yield! parseBlocks lines
     | HeadingHash (size,heading, lines) ->

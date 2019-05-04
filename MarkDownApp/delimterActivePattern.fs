@@ -57,7 +57,7 @@ let (|LineBreaks|_|) input =
     | StartsWith (List.ofSeq "  \\n\\r") (rest)
     | StartsWith (List.ofSeq "  \\n") (rest)
     | StartsWith (List.ofSeq "  \\r") (rest) ->Some(rest)
-    | _ ->None
+    | _ -> None
 
 // Block level managementr
 module List =
@@ -111,12 +111,12 @@ let matchBlockQuote lines =
     let (LineSeperated (quote, rest)) = lines
     quote, rest
 
-let (|HeadingDash|_|) lines = 
+let (|HeadingUnderline|_|) lines = 
     // Trying to find heading definitions === --- these appear UNDER another line. so we need the next line in a sequence/list
-    // PartialWhile will allow me to match (first line with text, then the rest) if rest.[0] is - or = then we have a heading.
+    // PartialWhile will allow me to match (first line with text, then the rest) if rest.[0] is - or = then we have a .heading
     let isWhite = System.String.IsNullOrWhiteSpace 
     match lines with
-    | h::tail when not(h.Equals(System.String.IsNullOrWhiteSpace)) -> 
+    | h::tail when not(h.Equals(isWhite)) -> 
         match tail with // We only need to match the first entry.
             | line::tail -> 
                 match line with
