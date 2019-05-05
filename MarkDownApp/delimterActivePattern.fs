@@ -54,14 +54,15 @@ let (|ConcurrentDelimiter|_|) first second input =
 let (|LineBreaks|_|) input = 
     let a= System.String(input |> List.rev |> List.toArray)
     match input with
-    | StartsWith (List.ofSeq "  \\n\\r") (rest)
+    | StartsWith (List.ofSeq "  
+    \\n\\r") (rest)
     | StartsWith (List.ofSeq "  \\n") (rest)
     | StartsWith (List.ofSeq "  \\r") (rest) ->Some(rest)
     | _ -> None
 
 // Block level managementr
 module List =
-    let partialWhile f =
+    let partitionWhile f =
         let rec loop acc = function
             | x::xs when f x -> loop (x::acc) xs // When f(x) is true then (if it doesn't pass the next lines are not checked) (I think thats' the partial)
             | xs -> List.rev acc , xs // end result is a Tuple
@@ -75,37 +76,38 @@ module String =
                         false
             | [] -> true
         loop
+
 let headerTest line = 
     let rec headingLoop accNumber  = function
            | l::lne when l.Equals('#') -> 
             let acPLus = accNumber + 1
-            printfn "ac Plus%d" acPLus
             headingLoop (acPLus) lne
-           | l::lne when l.Equals(' ') -> Some(accNumber, lne)
+           | l::lne when l.Equals(' ') -> 
+            Some(accNumber, lne)
            | [] 
            | _ -> None // These would be improperly formatted headingd
     headingLoop 0 line
 
-let headingLine chr (line:string) = 
-    if line.Length>2 && String.All chr (List.ofSeq line) then
-        true
-    else 
-        false
-   
-
+let headerCalculate line = 
+    let headerPartion = List.partitionWhile (fun f-> f='#') line
+    match headerPartion with // 
+     | (splats, txt) when splats.Length < 7 -> Some(splats.Length, txt.Tail)
+     | _ -> None
+     
+let isHeadingLine chr (line:string) = 
+     line.Length>2 && String.All chr (List.ofSeq line)
 
 let (|PrefixedLines|) (prefix:string) (lines:list<string>) = 
     let prefixed, other = 
-        lines |> List.partialWhile (fun line-> line.StartsWith(prefix))
+        lines |> List.partitionWhile (fun line-> line.StartsWith(prefix))
     [ for line in prefixed ->
         line.Substring(prefix.Length) ], other // remove the prefix from the line (That's a list  expression to make a tuple. Pithy) 
 
 let (|LineSeperated|) lines =  // returns (list untilFirstWhiteSpace (or no whitespace), list afterWhitepsace)
     let isWhite = System.String.IsNullOrWhiteSpace 
-    match List.partialWhile (isWhite >> not) lines with 
-        | par, _::rest
-        | par, ([] as rest) -> par, rest
-
+    match List.partitionWhile (isWhite >> not) lines with 
+     | par, _::rest
+     | par, ([] as rest) -> par, rest
 
 let matchBlockQuote lines =
     let (LineSeperated (quote, rest)) = lines
@@ -120,9 +122,9 @@ let (|HeadingUnderline|_|) lines =
         match tail with // We only need to match the first entry.
             | line::tail -> 
                 match line with
-                    | l  when headingLine '=' l ->
+                    | l  when isHeadingLine '=' l ->
                         Some(1,h |> List.ofSeq, tail)
-                    | l when headingLine '-' l ->
+                    | l when isHeadingLine '-' l ->
                         Some(2, h |> List.ofSeq, tail)
                     | _ -> None
             | _ -> None
@@ -134,13 +136,13 @@ let (|HorizontalRow|_|) lines =
                 match tail with // We only need to match the first entry.
                 | line::tail -> 
                     match line with
-                        | l when headingLine '*' l || headingLine '-' l || headingLine '_' l -> Some(tail)
+                        | l when isHeadingLine '*' l || isHeadingLine '-' l || isHeadingLine '_' l -> Some(tail)
                         | _ -> None
                 | _ -> None
     | _ -> None
 let (|HeadingHash|_|) =function
          | (line:string)::rest when line.StartsWith("#") ->  // the line starts with a # but is it actually a valid headers
-            match line |> List.ofSeq |> headerTest with
+            match line |> List.ofSeq |> headerCalculate with
             | Some(size, heading) -> Some(size, heading, rest)
             | _ -> None
          | [] 

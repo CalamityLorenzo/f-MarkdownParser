@@ -47,6 +47,8 @@ let rec parseBlocks lines = seq{
     //| AsCharList (StartsWith ['#'; '#'; ' '] heading)::lines ->
     //    yield Heading(2, parseSpans [] heading |> List.ofSeq)
     //    yield! parseBlocks lines
+    | line::lines when System.String.IsNullOrWhiteSpace(line)->
+        yield! parseBlocks lines
     | HeadingUnderline (size, heading, lines)  ->
         yield Heading(size, parseSpans [] heading |> List.ofSeq)
         yield! parseBlocks lines
@@ -67,8 +69,6 @@ let rec parseBlocks lines = seq{
     | LineSeperated (body, lines) when body <> []->
         let body = String.concat " " body |> List.ofSeq
         yield Paragraph(parseSpans [] body |> List.ofSeq)
-        yield! parseBlocks lines
-    | line::lines when System.String.IsNullOrWhiteSpace(line)->
         yield! parseBlocks lines
     | _ -> ()
 }

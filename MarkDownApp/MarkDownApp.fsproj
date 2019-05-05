@@ -6,11 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="mkFiles\mk2.md" />
+    <None Include="mkFiles\mk1.md" />
+    <Compile Include="MarkdownLoader.fs" />
     <Compile Include="delimterActivePattern.fs" />
     <Compile Include="MarkdownDocument.fs" />
     <Compile Include="basicRecursiveParser.fs" />
     <Compile Include="activePatternParser.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
+
+  <ItemGroup />
 
 </Project>
