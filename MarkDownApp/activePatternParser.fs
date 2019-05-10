@@ -46,7 +46,7 @@ let rec parseBlocks lines = seq{
     //    yield! parseBlocks lines
     //| AsCharList (StartsWith ['#'; '#'; ' '] heading)::lines ->
     //    yield Heading(2, parseSpans [] heading |> List.ofSeq)
-    //    yield! parseBlocks lines
+    //    yield! parseBlocks lines  
     | line::lines when System.String.IsNullOrWhiteSpace(line)->
         yield! parseBlocks lines
     | HeadingUnderline (size, heading, lines)  ->

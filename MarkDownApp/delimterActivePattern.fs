@@ -52,10 +52,13 @@ let (|ConcurrentDelimiter|_|) first second input =
             | _ -> None
         | _ -> None
 let (|LineBreaks|_|) input = 
-    let a= System.String(input |> List.rev |> List.toArray)
-    match input with
+    match input with    
+    | StartsWith (List.ofSeq "  \r\n") (rest)
+    | StartsWith (List.ofSeq "  \n") (rest)
+    | StartsWith (List.ofSeq "  \r") (rest)
     | StartsWith (List.ofSeq "  
     \\n\\r") (rest)
+    | StartsWith (List.ofSeq "  \\r\\n") (rest) 
     | StartsWith (List.ofSeq "  \\n") (rest)
     | StartsWith (List.ofSeq "  \\r") (rest) ->Some(rest)
     | _ -> None
@@ -67,26 +70,14 @@ module List =
             | x::xs when f x -> loop (x::acc) xs // When f(x) is true then (if it doesn't pass the next lines are not checked) (I think thats' the partial)
             | xs -> List.rev acc , xs // end result is a Tuple
         loop []
+// checks a value and eats the line at the same time. 
 module String = 
     let All chr = 
         let rec loop = function
-            | x::xs -> if x.Equals(chr) then 
-                        loop xs
-                       else
-                        false
+            | x::xs when x.Equals(chr) -> loop xs
+            | xs -> false 
             | [] -> true
         loop
-
-let headerTest line = 
-    let rec headingLoop accNumber  = function
-           | l::lne when l.Equals('#') -> 
-            let acPLus = accNumber + 1
-            headingLoop (acPLus) lne
-           | l::lne when l.Equals(' ') -> 
-            Some(accNumber, lne)
-           | [] 
-           | _ -> None // These would be improperly formatted headingd
-    headingLoop 0 line
 
 let headerCalculate line = 
     let headerPartion = List.partitionWhile (fun f-> f='#') line
@@ -106,13 +97,14 @@ let (|PrefixedLines|) (prefix:string) (lines:list<string>) =
 let (|LineSeperated|) lines =  // returns (list untilFirstWhiteSpace (or no whitespace), list afterWhitepsace)
     let isWhite = System.String.IsNullOrWhiteSpace 
     match List.partitionWhile (isWhite >> not) lines with 
-     | par, _::rest
+     | par, _::rest // This discards the first entry in the remaining column.
      | par, ([] as rest) -> par, rest
 
 let matchBlockQuote lines =
-    let (LineSeperated (quote, rest)) = lines
-    quote, rest
-
+    let isBlock = "> "
+    match List.partitionWhile(fun (i:string)-> i.StartsWith(isBlock)) lines with 
+      | par, others-> par, others
+    
 let (|HeadingUnderline|_|) lines = 
     // Trying to find heading definitions === --- these appear UNDER another line. so we need the next line in a sequence/list
     // PartialWhile will allow me to match (first line with text, then the rest) if rest.[0] is - or = then we have a .heading
@@ -132,7 +124,7 @@ let (|HeadingUnderline|_|) lines =
 let (|HorizontalRow|_|) lines = 
     let isWhite = System.String.IsNullOrWhiteSpace 
     match lines with
-    | h::tail when h.Equals(System.String.IsNullOrWhiteSpace) -> // empty row found  could be a horizontal 
+    | h::tail when h.Equals(isWhite) -> // empty row found  could be a horizontal 
                 match tail with // We only need to match the first entry.
                 | line::tail -> 
                     match line with
@@ -152,10 +144,7 @@ let (|BlockQuotes|_|) (lines:list<string>) =
     | lne::_ when lne.StartsWith "> " -> 
         let quote, rest = (matchBlockQuote lines)
         Some([for line in quote ->
-                if line.StartsWith("> ") then
-                    line.Substring 2
-                else
-                    line
+                line.Substring 2
         ], rest)
     | _ -> None
 let (|AsCharList|) (str:string) =

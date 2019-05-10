@@ -25,10 +25,12 @@ let translateMarkspan spans =
 
 [<EntryPoint>]
 let main argv =
-    printfn "Hello World from F#!"
+    let filenMae = @"\mkFiles\mk2.md"
+    printfn "Hello World from F#! %s" filenMae
     let bum = "#### This is on tv" |> Seq.toArray
-    let markdownFiles= __SOURCE_DIRECTORY__ + @"\mkFiles\mk2.md"
-    let markdownLines = MarkdownLoader.getTextLines markdownFiles |> Seq.toList
+    let markdownFiles= __SOURCE_DIRECTORY__ + filenMae
+    //let markdownLines = MarkdownLoader.getTextAsync markdownFiles  |>  Async.RunSynchronously |> System.Text.Encoding.ASCII.GetString 
+    let markdownLines = (MarkdownLoader.getTextLines markdownFiles) |> Seq.toList
     let results = parseBlocks markdownLines
     Seq.iter (fun f -> printfn "%O" f ) results
     0 // return an integer exit code
